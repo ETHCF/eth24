@@ -1,0 +1,7 @@
+output/
+__pycache__/
+*.pyc
+.env
+
+# Font files (download separately, see README)
+fonts/*.ttf
