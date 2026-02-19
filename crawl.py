@@ -372,8 +372,8 @@ def crawl_x():
     # --- Score, filter, return ---
     candidates.sort(key=lambda x: x["engagement_score"], reverse=True)
 
-    # Max 2 tweets per account
-    max_per_account = CONFIG["crawl"].get("max_per_account", 2)
+    # Max 3 tweets per account
+    max_per_account = CONFIG["crawl"].get("max_per_account", 3)
     handle_counts = {}
     deduped = []
     for t in candidates:
