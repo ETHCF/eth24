@@ -4,7 +4,7 @@ You are running ETH24, a daily digest tool that surfaces the top tweets for a co
 
 ## Pipeline
 
-1. **Crawl** - Run `python3 crawl.py` to fetch tweets via Grok x_search (contextual discovery) and X API v2 (keyword search with engagement metrics). Output: `output/YYYY-MM-DD/crawled.json`
+1. **Crawl** - Run `python3 crawl.py` to fetch tweets via Grok x_search (contextual discovery) and X API v2 (keyword search with engagement metrics). Requires `X_BEARER_TOKEN` and `XAI_API_KEY` environment variables. Output: `output/YYYY-MM-DD/crawled.json`
 
 2. **Rank** - Read the crawled data from `output/YYYY-MM-DD/crawled.json`. Select up to 10 tweets by ecosystem importance. Filter out spam (airdrop scams, engagement farming, hashtag spam). Write one-line commentary for each. On quiet days, include fewer stories. If nothing clears the bar, return 0 stories.
 
