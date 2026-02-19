@@ -66,13 +66,18 @@ def grok_discover():
             f"Find the highest-engagement tweets (most likes and retweets) about "
             f"each story. Include tweets from major news aggregators, media accounts, "
             f"and official project accounts. "
+            f"Also check for major tech companies (OpenAI, Google, Microsoft, etc.) "
+            f"intersecting with {topic} or blockchain. "
             f"Return at least 10 tweets with their full URLs."
         ),
         (
             f"Find important {topic} ecosystem tweets from the last {lookback} hours. "
             f"Search terms: {', '.join(terms)}. "
             f"Focus on: technical developments, governance, institutional moves, "
-            f"and notable takes from prominent builders and researchers. "
+            f"major partnerships or research papers, and notable takes from "
+            f"prominent builders and researchers. "
+            f"Include cross-domain stories where major companies or institutions "
+            f"intersect with {topic} (e.g. AI + smart contracts, TradFi + DeFi). "
             f"Exclude price commentary and shilling. "
             f"Return at least 10 tweets with their full URLs."
         ),
@@ -154,9 +159,9 @@ def search_x_api(query, max_pages=3, sort_order="recency"):
     params = {
         "query": query,
         "max_results": 100,
-        "tweet.fields": "created_at,public_metrics,author_id,entities",
+        "tweet.fields": "created_at,public_metrics,author_id,entities,referenced_tweets",
         "user.fields": "username,name,verified",
-        "expansions": "author_id",
+        "expansions": "author_id,referenced_tweets.id,referenced_tweets.id.author_id",
         "start_time": start,
         "sort_order": sort_order,
     }
@@ -190,6 +195,9 @@ def search_x_api(query, max_pages=3, sort_order="recency"):
             users_map[u["id"]] = u
 
         for t in data.get("data", []):
+            all_tweets.append(t)
+        # Include referenced tweets (originals of quotes/replies)
+        for t in data.get("includes", {}).get("tweets", []):
             all_tweets.append(t)
 
         next_token = data.get("meta", {}).get("next_token")
@@ -226,9 +234,9 @@ def lookup_tweets(tweet_ids):
                 headers=headers,
                 params={
                     "ids": ",".join(batch),
-                    "tweet.fields": "created_at,public_metrics,author_id,entities",
+                    "tweet.fields": "created_at,public_metrics,author_id,entities,referenced_tweets",
                     "user.fields": "username,name,verified",
-                    "expansions": "author_id",
+                    "expansions": "author_id,referenced_tweets.id,referenced_tweets.id.author_id",
                 },
                 timeout=30,
             )
@@ -249,6 +257,9 @@ def lookup_tweets(tweet_ids):
         for u in data.get("includes", {}).get("users", []):
             users_map[u["id"]] = u
         for t in data.get("data", []):
+            all_tweets.append(t)
+        # Include referenced tweets (originals of quotes/replies)
+        for t in data.get("includes", {}).get("tweets", []):
             all_tweets.append(t)
 
         time.sleep(0.35)
@@ -288,10 +299,15 @@ def crawl_x():
     seen_ids = set()
     candidates = []
 
-    # --- Grok contextual discovery ---
-    print("  [Grok] Contextual discovery...", file=sys.stderr)
-    grok_tweets = grok_discover()
-    print(f"  [Grok] Found {len(grok_tweets)} tweet URLs", file=sys.stderr)
+    # --- Grok contextual discovery (multi-round for coverage) ---
+    grok_rounds = CONFIG["crawl"].get("grok_rounds", 2)
+    all_grok = {}
+    for r in range(grok_rounds):
+        print(f"  [Grok] Round {r + 1}/{grok_rounds}...", file=sys.stderr)
+        for t in grok_discover():
+            all_grok[t["tweet_id"]] = t
+    grok_tweets = list(all_grok.values())
+    print(f"  [Grok] Found {len(grok_tweets)} unique tweet URLs", file=sys.stderr)
 
     # Enrich Grok's picks with real metrics via X API lookup
     grok_ids = [t["tweet_id"] for t in grok_tweets]
@@ -337,7 +353,15 @@ def crawl_x():
             spam_removed += 1
             continue
         text_lower = t["text"].lower()
-        if any(w in text_lower for w in ["airdrop", "claiming your", "claim your", "grab your tokens"]):
+        spam_phrases = [
+            "airdrop", "claiming your", "claim your", "grab your tokens",
+            "free mint", "giveaway", "whitelist", "wl spot",
+            "drop your wallet", "drop your address", "drop your eth",
+            "send your evm", "send your eth address",
+            "like and rt", "like + rt", "follow and rt",
+            "gtd wl", "gtd spot",
+        ]
+        if any(w in text_lower for w in spam_phrases):
             spam_removed += 1
             continue
         clean.append(t)

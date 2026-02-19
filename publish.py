@@ -91,8 +91,8 @@ def format_tweet(ranked):
         lines.append(f"\n♦︎ {commentary}\n{tweet_url}")
 
     lines.append(
-        f"\n{brand.get('name', 'ETH24')} by {brand.get('account', '@ethcforg')}\n"
-        f"Open source: {brand.get('repo_url', 'github.com/ETHCF/eth24')}"
+        f"\nETH24 is an open source publication covering the last 24 hours "
+        f"in Ethereum. Contributions welcome:\nhttps://github.com/ETHCF/eth24"
     )
 
     return "\n".join(lines)

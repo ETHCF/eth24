@@ -19,13 +19,14 @@ def call_anthropic(prompt):
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         return None
+    headers = {
+        "x-api-key": api_key,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+    }
     resp = httpx.post(
         "https://api.anthropic.com/v1/messages",
-        headers={
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "Content-Type": "application/json",
-        },
+        headers=headers,
         json={
             "model": "claude-sonnet-4-20250514",
             "max_tokens": 3000,

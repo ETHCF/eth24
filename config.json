@@ -7,8 +7,12 @@
   },
   "crawl": {
     "x_search_terms": [
-      "Ethereum", "ETH", "EIP", "Pectra", "L2", "rollups",
-      "Vitalik Buterin", "Base chain", "blob fees", "Ethereum governance"
+      "Ethereum", "ETH", "EIP", "EVM", "Pectra",
+      "L2", "rollups",
+      "Vitalik Buterin", "Base chain", "Base L2",
+      "Arbitrum", "zkSync", "Starknet",
+      "blob fees", "Ethereum governance",
+      "Solidity", "Foundry"
     ],
     "rss_feeds": {
       "The Block": "https://www.theblock.co/rss.xml",
@@ -16,6 +20,7 @@
       "Ethereum Foundation Blog": "https://blog.ethereum.org/feed.xml",
       "Week in Ethereum": "https://weekinethereumnews.com/feed/"
     },
+    "grok_rounds": 3,
     "lookback_hours": 24,
     "max_tweets": 10,
     "engagement_floor": 200,
