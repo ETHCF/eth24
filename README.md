@@ -8,7 +8,7 @@ Fork it for any topic.
 
 1. **Crawl** - Dual Grok x_search (trending + ecosystem) finds tweets by context, dual X API v2 search (relevancy + recency) finds tweets by engagement, RSS feeds for background context
 2. **Rank** - AI selects up to 10 by importance, writes one-line commentary
-3. **Output** - CLI (stdout) or tweet mode (Typefully)
+3. **Output** - CLI (stdout) or tweet mode (formatted post preview)
 
 ```
 Grok x_search (trending) ──\
@@ -69,7 +69,7 @@ Clone this repo and run `/eth24` from Claude Code. Claude handles the ranking di
 ```bash
 pip install -r requirements.txt
 python3 main.py            # CLI mode (default)
-python3 main.py --mode tweet  # Typefully draft
+python3 main.py --mode tweet  # Tweet-formatted preview
 ```
 
 ## Setup

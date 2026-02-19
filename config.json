@@ -20,7 +20,6 @@
       "Ethereum Foundation Blog": "https://blog.ethereum.org/feed.xml",
       "Week in Ethereum": "https://weekinethereumnews.com/feed/"
     },
-    "grok_rounds": 3,
     "lookback_hours": 24,
     "max_tweets": 10,
     "engagement_floor": 200,
@@ -29,8 +28,5 @@
   "rank": {
     "ai_provider_order": ["anthropic", "xai"],
     "voice": "Concise, informed, direct. Short sentences. Plain language. No emojis. No emdashes."
-  },
-  "publish": {
-    "platform": "typefully"
   }
 }

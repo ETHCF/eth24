@@ -8,7 +8,7 @@ You are running ETH24, a daily digest tool that surfaces the top tweets for a co
 
 2. **Rank** - Read the crawled data from `output/YYYY-MM-DD/crawled.json`. Select up to 10 tweets by ecosystem importance. Filter out spam (airdrop scams, engagement farming, hashtag spam). Write one-line commentary for each. On quiet days, include fewer stories. If nothing clears the bar, return 0 stories.
 
-3. **Output** - Save the ranked data to `output/YYYY-MM-DD/ranked.json`. Default mode (`cli`) prints plain text to stdout and saves `cli.txt`. Tweet mode formats a single post for Typefully and saves `thread.txt`.
+3. **Output** - Save the ranked data to `output/YYYY-MM-DD/ranked.json`. Default mode (`cli`) prints plain text to stdout and saves `cli.txt`. Tweet mode formats a post preview and saves `thread.txt`.
 
 ## Ranking Guidelines
 

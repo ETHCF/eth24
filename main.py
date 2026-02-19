@@ -6,7 +6,6 @@ crawl -> rank -> publish
 
 import argparse
 import json
-import os
 import sys
 import traceback
 from datetime import datetime, timezone
@@ -22,7 +21,7 @@ def run():
         "--mode",
         choices=["tweet", "cli"],
         default="cli",
-        help="Output mode: tweet (Typefully) or cli (stdout)",
+        help="Output mode: tweet (post preview) or cli (stdout)",
     )
     args = parser.parse_args()
 
@@ -70,24 +69,13 @@ def run():
         return
 
     # 3 - Output
-    from publish import format_tweet, format_cli, create_draft
+    from publish import format_tweet, format_cli
 
     if args.mode == "tweet":
-        print("\n[3/3] Publishing tweet...")
+        print("\n[3/3] Formatting tweet...")
         text = format_tweet(ranked)
         (out_dir / "thread.txt").write_text(text)
-
-        social_set_id = os.environ.get("TYPEFULLY_SOCIAL_SET_ID")
-        typefully_key = os.environ.get("TYPEFULLY_API_KEY")
-
-        if social_set_id and typefully_key:
-            posts = [{"text": text}]
-            create_draft(social_set_id, posts)
-            print("  Draft created on Typefully")
-        else:
-            print("  Typefully keys not set - saved tweet preview only", file=sys.stderr)
-
-        print(f"  Tweet preview: {out_dir / 'thread.txt'}")
+        print(f"  Saved to {out_dir / 'thread.txt'}")
     else:
         print("\n[3/3] Output...")
         text = format_cli(ranked)
