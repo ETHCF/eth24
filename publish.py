@@ -13,6 +13,18 @@ CONFIG = json.loads((SCRIPT_DIR / "config.json").read_text())
 def format_tweet(ranked):
     """Format ranked data as a single tweet."""
     stories = ranked.get("stories", [])
+
+    # Max 1 tweet per account
+    seen = set()
+    deduped = []
+    for s in stories:
+        h = s.get("handle", "").lower()
+        if h and h in seen:
+            continue
+        seen.add(h)
+        deduped.append(s)
+    stories = deduped
+
     highlights = ranked.get("highlights", "")
     date_label = ranked.get("date_label", datetime.now().strftime("%-m/%d/%y"))
     brand = CONFIG.get("brand", {})
@@ -35,6 +47,18 @@ def format_tweet(ranked):
 def format_cli(ranked):
     """Format ranked data as plain text for stdout."""
     stories = ranked.get("stories", [])
+
+    # Max 1 tweet per account
+    seen = set()
+    deduped = []
+    for s in stories:
+        h = s.get("handle", "").lower()
+        if h and h in seen:
+            continue
+        seen.add(h)
+        deduped.append(s)
+    stories = deduped
+
     highlights = ranked.get("highlights", "")
     date_label = ranked.get("date_label", datetime.now().strftime("%-m/%d/%y"))
     brand = CONFIG.get("brand", {})

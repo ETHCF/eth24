@@ -196,9 +196,6 @@ def search_x_api(query, max_pages=3, sort_order="recency"):
 
         for t in data.get("data", []):
             all_tweets.append(t)
-        # Include referenced tweets (originals of quotes/replies)
-        for t in data.get("includes", {}).get("tweets", []):
-            all_tweets.append(t)
 
         next_token = data.get("meta", {}).get("next_token")
         if not next_token:
@@ -258,9 +255,6 @@ def lookup_tweets(tweet_ids):
             users_map[u["id"]] = u
         for t in data.get("data", []):
             all_tweets.append(t)
-        # Include referenced tweets (originals of quotes/replies)
-        for t in data.get("includes", {}).get("tweets", []):
-            all_tweets.append(t)
 
         time.sleep(0.35)
 
@@ -311,13 +305,28 @@ def crawl_x():
 
     # Enrich Grok's picks with real metrics via X API lookup
     grok_ids = [t["tweet_id"] for t in grok_tweets]
+    lookback = CONFIG["crawl"].get("lookback_hours", 24)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=lookback)
     if grok_ids:
         raw_looked_up, lu_users = lookup_tweets(grok_ids)
+        stale = 0
         for raw in raw_looked_up:
             enriched = _raw_to_enriched(raw, lu_users, source="grok")
-            if enriched["id"] not in seen_ids:
-                candidates.append(enriched)
-                seen_ids.add(enriched["id"])
+            if enriched["id"] in seen_ids:
+                continue
+            created = enriched.get("created_at", "")
+            if created:
+                try:
+                    tweet_dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
+                    if tweet_dt < cutoff:
+                        stale += 1
+                        continue
+                except ValueError:
+                    pass
+            candidates.append(enriched)
+            seen_ids.add(enriched["id"])
+        if stale:
+            print(f"  [Grok] Dropped {stale} stale tweets (>{lookback}h old)", file=sys.stderr)
         print(
             f"  [Grok] Enriched {len(raw_looked_up)}/{len(grok_ids)} with metrics",
             file=sys.stderr,

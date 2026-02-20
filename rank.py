@@ -115,6 +115,7 @@ Examples of good commentary:
 - "Vitalik commits $45M to Ethereum privacy projects. a16z and Barry Silbert also flagging privacy as a priority."
 
 Rules:
+- Maximum 1 tweet per account. If multiple tweets from the same person are important, pick the most significant one.
 - Commentary: 1-2 short sentences MAX. Tell the reader why this matters. Don't restate the tweet.
 - Be accurate. Don't claim "first" or "biggest" unless you're certain. Stick to what the tweet actually says.
 - NEVER use emojis or emdashes. Use hyphens (-) not emdashes.
